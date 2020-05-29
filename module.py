@@ -17,6 +17,10 @@ HTML_GUBAKHAOKRUG = 'http://gubakhaokrug.ru/okrug/'
 HTML_GUBAKHAOKRUG_SECTIONS = ['novosti', 'media/fotogalereya']
 HTML_NASHAGUBAHA = 'https://nashagubaha.ru/category/'
 HTML_NASHAGUBAHA_SECTIONS = ['cover-stories', 'leisure', 'life', 'health', 'pogoda', 'proisschestviya', 'statyi']
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3)\
+     AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/7046A194A'
+}
 
 Base = declarative_base()
 
@@ -68,7 +72,7 @@ class Gubakhaokrug(HtmlParser):
         try:
             rez = []
             for section in self.sections:
-                r = requests.get(self.html_url + section)
+                r = requests.get(self.html_url + section, headers=HEADERS)
                 soup = BeautifulSoup(r.content, 'html.parser')
                 if section in 'novosti':
                     elements = soup.find_all('a', attrs={'class': 'news__title'})
@@ -88,7 +92,7 @@ class Nashagubaha(HtmlParser):
         try:
             rez = []
             for section in self.sections:
-                r = requests.get(self.html_url + section)
+                r = requests.get(self.html_url + section, headers=HEADERS)
                 soup = BeautifulSoup(r.content, 'html.parser')
                 elements = soup.find_all('h2', attrs={'class': 'entry-title'})
                 for elem in elements:
