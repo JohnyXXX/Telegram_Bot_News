@@ -13,10 +13,11 @@ from sqlalchemy_utils import database_exists
 
 RSS_MEDIAKUB = 'https://mediakub.net/rss'
 RSS_NEWGUBAKHA = 'http://newgubakha.ru/index.php?option=com_ninjarsssyndicator&feed_id=1&format=raw'
+RSS_NASHAGUBAHA = 'https://nashagubaha.ru/feed/'
 HTML_GUBAKHAOKRUG = 'http://gubakhaokrug.ru/okrug/'
 HTML_GUBAKHAOKRUG_SECTIONS = ['novosti', 'media/fotogalereya']
-HTML_NASHAGUBAHA = 'https://nashagubaha.ru/category/'
-HTML_NASHAGUBAHA_SECTIONS = ['cover-stories', 'leisure', 'life', 'health', 'pogoda', 'proisschestviya', 'statyi']
+# HTML_NASHAGUBAHA = 'https://nashagubaha.ru/category/'
+# HTML_NASHAGUBAHA_SECTIONS = ['cover-stories', 'leisure', 'life', 'health', 'pogoda', 'proisschestviya', 'statyi']
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3)\
      AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/7046A194A'
@@ -31,12 +32,12 @@ class Parser:
             self.site1 = RssParser(RSS_MEDIAKUB)
             self.site2 = RssParser(RSS_NEWGUBAKHA)
             self.site3 = Gubakhaokrug(HTML_GUBAKHAOKRUG, HTML_GUBAKHAOKRUG_SECTIONS)
-            self.site4 = Nashagubaha(HTML_NASHAGUBAHA, HTML_NASHAGUBAHA_SECTIONS)
+            self.site4 = RssParser(RSS_NASHAGUBAHA)
         except Exception as e:
             print(e, file=stderr)
 
     def run(self):
-        return self.site1.feed_parser() + self.site2.feed_parser() + self.site3.html_parser() + self.site4.html_parser()
+        return self.site1.feed_parser() + self.site2.feed_parser() + self.site3.html_parser() + self.site4.feed_parser()
 
 
 class RssParser:
