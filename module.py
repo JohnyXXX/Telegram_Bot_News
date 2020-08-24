@@ -1,4 +1,5 @@
 import os
+import ssl
 from datetime import datetime
 from sys import stderr
 
@@ -43,6 +44,8 @@ class Parser:
 class RssParser:
     def __init__(self, rss_url):
         try:
+            if hasattr(ssl, '_create_unverified_context'):
+                ssl._create_default_https_context = ssl._create_unverified_context
             self.d = feedparser.parse(
                 rss_url
             )
