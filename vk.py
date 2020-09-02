@@ -15,7 +15,7 @@ class VkGroupParser:
     def vk_wall_search(
             self,
             owner_id=int(config['vk']['VK_COMMUNITY_ID']),
-            query=config['vk']['VK_SEARCH_QUERY'],
+            query='#расписаниесеансов',
             count=1
     ):
         posts = []

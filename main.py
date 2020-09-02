@@ -4,8 +4,8 @@ from sys import stderr, stdout
 import telebot
 from telebot import types
 
-from .module import DataBase, Parser
-from .vk import VkGroupParser
+from module import DataBase, Parser
+from vk import VkGroupParser
 
 config = configparser.ConfigParser()
 config.read('config.ini', encoding='utf-8')
