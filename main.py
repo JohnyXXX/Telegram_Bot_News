@@ -4,10 +4,11 @@ from sys import stderr, stdout
 import telebot
 from telebot import types
 
-from module import DataBase, Parser
+from .module import DataBase, Parser
+from .vk import VkGroupParser
 
 config = configparser.ConfigParser()
-config.read('config.ini')
+config.read('config.ini', encoding='utf-8')
 bot = telebot.TeleBot(config['telegram']['tg_bot_token'])
 
 
@@ -22,15 +23,11 @@ def markup_text_gen(text):
         return '🔗 Наша Губаха'
 
 
-def send_photo_to_tg_channel(chat_id, item):
-    msg = bot.send_photo(chat_id=chat_id, photo=item['url'], caption=item['title'])
-    bot.pin_chat_message(msg.chat.id, msg.message_id)
-
-
 class Main:
     def __init__(self):
         self.db = DataBase('db')
         self.p = Parser()
+        self.vk = VkGroupParser()
 
     def __prepare_message_for_send(self, text):
         self.rhash = None
@@ -51,6 +48,11 @@ class Main:
         bot.send_message(chat_id=chat_id, text=self.__prepare_message_for_send(item), parse_mode=parse_mode,
                          reply_markup=markup)
 
+    @staticmethod
+    def __send_photo_to_tg_channel(chat_id, item):
+        msg = bot.send_photo(chat_id=chat_id, photo=item['url'], caption=item['title'])
+        bot.pin_chat_message(msg.chat.id, msg.message_id)
+
     def run(self):
         try:
             for item in self.p.run():
@@ -58,6 +60,13 @@ class Main:
                     continue
                 else:
                     self.__send_message_to_tg_channel(config.get('telegram', 'tg_id_channel'), item)
+                    self.db.add_to_db(item)
+                    print('Send to Telegram', item, file=stdout)
+            for item in self.vk.vk_wall_search():
+                if item['title'] in self.db.titles_from_db():
+                    continue
+                else:
+                    self.__send_photo_to_tg_channel(config.get('telegram', 'tg_id_channel'), item)
                     self.db.add_to_db(item)
                     print('Send to Telegram', item, file=stdout)
         except Exception as e:
