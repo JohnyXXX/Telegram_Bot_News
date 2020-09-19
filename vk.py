@@ -8,7 +8,7 @@ config.read('config.ini', encoding='utf-8')
 
 class VkGroupParser:
     def __init__(self):
-        self.vk_session = vk_api.VkApi(token=config['vk']['ACCESS_TOKEN'])
+        self.vk_session = vk_api.VkApi(token=config['vk']['ACCESS_TOKEN'], api_version='5.124')
         self.vk = self.vk_session.get_api()
         self.tools = vk_api.VkTools(self.vk_session)
 
@@ -21,21 +21,23 @@ class VkGroupParser:
         posts = []
         for item in self.vk.wall.search(owner_id=owner_id, query=query, count=count)['items']:
             img_url = None
-            for size in item['attachments'][0]['photo']['sizes']:
-                if size['type'] == 'w':
-                    img_url = size
-                    break
-                elif size['type'] == 'z':
-                    img_url = size
-                    break
-                elif size['type'] == 'y':
-                    img_url = size
-                    break
-            posts.append({'title': self.__vk_post_edit(item['text']), 'url': img_url['url']})
+            try:
+                for size in item['attachments'][0]['photo']['sizes']:
+                    if size['type'] == 'w':
+                        img_url = size['url']
+                        break
+                    elif size['type'] == 'z':
+                        img_url = size['url']
+                        break
+                    elif size['type'] == 'y':
+                        img_url = size['url']
+                        break
+            except KeyError:
+                img_url = item['attachments'][0]['doc']['url']
+            posts.append({'title': self.__vk_post_edit(item['text']), 'url': img_url})
         return posts
 
-    @staticmethod
-    def __vk_post_edit(text):
+    def __vk_post_edit(self, text):
         return text.replace(
             ' \n \n#киновГубахе #кинозалвГубахе #кинотеатрвГубахе'
             ' #кинозалКиноЛит #расписаниесеансов #кино #Губаха #КиноЛит',
