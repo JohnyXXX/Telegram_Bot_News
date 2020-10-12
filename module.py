@@ -2,6 +2,7 @@ import os
 import ssl
 from datetime import datetime
 from sys import stderr
+from urllib.parse import quote
 
 import feedparser
 import requests
@@ -56,7 +57,7 @@ class RssParser:
         try:
             rez = []
             for entry in self.d['entries']:
-                rez.append({'title': entry['title'], 'url': entry['link']})
+                rez.append({'title': entry['title'], 'url': quote(entry['link'], safe='/:')})
             return rez
         except Exception as e:
             print(e, file=stderr)
