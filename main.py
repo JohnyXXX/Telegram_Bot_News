@@ -73,5 +73,6 @@ class Main:
             print(e, file=stderr)
 
 
-start = Main()
-start.run()
+if __name__ == '__main__':
+    start = Main()
+    start.run()
