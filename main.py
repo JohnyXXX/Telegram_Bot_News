@@ -7,6 +7,7 @@ from telebot import types
 from module import DataBase, Parser
 from vk import VkGroupParser
 
+TG_BOT_API_LIMIT_REQUESTS = 19
 config = configparser.ConfigParser()
 config.read('config.ini', encoding='utf-8')
 bot = telebot.TeleBot(config['telegram']['tg_bot_token'])
@@ -54,21 +55,26 @@ class Main:
         bot.pin_chat_message(msg.chat.id, msg.message_id)
 
     def run(self):
+        counter = 0
         try:
             for item in self.p.run():
                 if item['url'] in self.db.urls_from_db():
                     continue
                 else:
-                    self.__send_message_to_tg_channel(config.get('telegram', 'tg_id_channel'), item)
-                    self.db.add_to_db(item)
-                    print('Send to Telegram', item, file=stdout)
+                    if counter <= TG_BOT_API_LIMIT_REQUESTS:
+                        self.__send_message_to_tg_channel(config.get('telegram', 'tg_id_channel'), item)
+                        self.db.add_to_db(item)
+                        counter += 1
+                        print('Send to Telegram', item, file=stdout)
             for item in self.vk.vk_wall_search():
                 if item['title'] in self.db.titles_from_db():
                     continue
                 else:
-                    self.__send_photo_to_tg_channel(config.get('telegram', 'tg_id_channel'), item)
-                    self.db.add_to_db(item)
-                    print('Send to Telegram', item, file=stdout)
+                    if counter <= TG_BOT_API_LIMIT_REQUESTS:
+                        self.__send_photo_to_tg_channel(config.get('telegram', 'tg_id_channel'), item)
+                        self.db.add_to_db(item)
+                        counter += 1
+                        print('Send to Telegram', item, file=stdout)
         except Exception as e:
             print(e, file=stderr)
 
