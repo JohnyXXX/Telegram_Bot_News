@@ -8,7 +8,7 @@ config.read('config.ini', encoding='utf-8')
 
 class VkGroupParser:
     def __init__(self):
-        self.vk_session = vk_api.VkApi(token=config['vk']['ACCESS_TOKEN'], api_version='5.124')
+        self.vk_session = vk_api.VkApi(token=config['vk']['ACCESS_TOKEN'], api_version='5.126')
         self.vk = self.vk_session.get_api()
         self.tools = vk_api.VkTools(self.vk_session)
 
@@ -23,15 +23,8 @@ class VkGroupParser:
             img_url = None
             try:
                 for size in item['attachments'][0]['photo']['sizes']:
-                    if size['type'] == 'w':
+                    if '&proxy=1&' in size['url']:
                         img_url = size['url']
-                        break
-                    elif size['type'] == 'z':
-                        img_url = size['url']
-                        break
-                    elif size['type'] == 'y':
-                        img_url = size['url']
-                        break
             except KeyError:
                 img_url = item['attachments'][0]['doc']['url']
             posts.append({'title': self.__vk_post_edit(item['text']), 'url': img_url})
